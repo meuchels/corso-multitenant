@@ -1,0 +1,20 @@
+#!/bin/bash
+
+##############Begin Edit###
+
+#change blank to tenant short name
+source /opt/corso/scripts/environments/blank-exchange
+
+##############End Edit###
+
+
+# create runtime variables
+logfilename="/opt/corso/log/${tenantshortname}-exchange/$(date +'%Y-%m-%d-%H%M%S').log"
+runcorso="/opt/corso/corso"
+
+# init bucket
+$runcorso repo init s3 --bucket $bucket --prefix ${tenantshortname}_exchange --endpoint $s3endpoint --log-file $logfilename --config-file $configfile --hide-progress
+$runcorso repo connect s3 --bucket $bucket --log-file $logfilename --config-file $configfile --hide-progress
+
+# Run Backup
+$runcorso backup create exchange --mailbox '*' --log-file $logfilename --config-file $configfile --hide-progress
