@@ -1,2 +1,2 @@
 # corso-multitenant
-a multi-tenant setup for corso backup of microsoft 365
+a multi-tenant setup for <a href="https://github.com/alcionai/corso">corso</a> backup of microsoft 365
