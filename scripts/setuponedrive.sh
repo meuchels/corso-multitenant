@@ -22,8 +22,8 @@ read -p "Enter your AZURE_CLIENT_SECRET: " AZURE_CLIENT_SECRET
 source ../secrets
 
 # Define file paths
-environment_file="./environments/$SHORT_TENANT_NAME-exchange"
-backup_file="./back-available/$SHORT_TENANT_NAME-exchange"
+environment_file="./environments/$SHORT_TENANT_NAME-onedrive"
+backup_file="./back-available/$SHORT_TENANT_NAME-onedrive"
 
 # Check if environment file already exists
 if [ -f "$environment_file" ]; then
@@ -59,7 +59,7 @@ export bucket="$bucket"
 ####################################
 #END EDIT
 ####################################
-export configfile=/opt/corso/toml/${tenantshortname}-exchange.toml
+export configfile=/opt/corso/toml/${tenantshortname}-onedrive.toml
 EOF
 )
 
@@ -91,21 +91,21 @@ content_backup=$(cat <<EOF
 ##############Begin Edit###
 
 #change blank to tenant short name
-source /opt/corso/scripts/environments/$TENANT_SHORT_NAME-exchange
+source /opt/corso/scripts/environments/$TENANT_SHORT_NAME-onedrive
 
 ##############End Edit###
 
 
 # create runtime variables
-logfilename="/opt/corso/log/${tenantshortname}-exchange/$(date +'%Y-%m-%d-%H%M%S').log"
+logfilename="/opt/corso/log/${tenantshortname}-onedrive/$(date +'%Y-%m-%d-%H%M%S').log"
 runcorso="/opt/corso/corso"
 
 # init bucket
-$runcorso repo init s3 --bucket $bucket --prefix ${tenantshortname}_exchange --endpoint $s3endpoint --log-file $logfilename --config-file $configfile --hide-progress
+$runcorso repo init s3 --bucket $bucket --prefix ${tenantshortname}_onedrive --endpoint $s3endpoint --log-file $logfilename --config-file $configfile --hide-progress
 $runcorso repo connect s3 --bucket $bucket --log-file $logfilename --config-file $configfile --hide-progress
 
 # Run Backup
-$runcorso backup create exchange --mailbox '*' --log-file $logfilename --config-file $configfile --hide-progress
+$runcorso backup create onedrive --user '*' --log-file $logfilename --config-file $configfile --hide-progress
 EOF
 )
 
