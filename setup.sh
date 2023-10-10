@@ -6,17 +6,17 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Check if there are any files in /opt/corso/scripts/back-available
-if [ -n "$(ls -A /opt/corso/scripts/back-available)" ]; then
-    read -p "There are existing backup scripts in /opt/corso/scripts/back-available. Do you want to proceed with reinstallation? (y/n): " proceed_with_install
-    if [ "$proceed_with_install" != "n" ]; then
+# Check if there are any files in /opt/corso/
+if [ -n "$(ls -A /opt/corso/scripts/)" ]; then
+    read -p "It looks like there is an existing installation in /opt/corso. Do you want to proceed with reinstallation? (y/n): " proceed_with_install
+    if [ "$proceed_with_install" != "y" ]; then
         read -p "Do you want to set up a new backup instead? (y/n): " setup_new_backup
         if [ "$setup_new_backup" == "y" ]; then
             /opt/corso/scripts/choosebackuptype.sh
         fi
         exit 0
     else
-        read -p "Are you sure you want to proceed? This will overwrite your existing installation!!! (y/n): " confirm_overwrite
+        read -p "WARNING!!! Are you sure you want to proceed? This will overwrite your existing installation!!!  There is no going back!!! (y/n): " confirm_overwrite
         if [ "$confirm_overwrite" != "y" ]; then
             echo "Aborted. Exiting..."
             exit 0
@@ -26,8 +26,8 @@ fi
 
 echo "Before proceeding you will want to make sure you have configured your tenant using the instructions here https://corsobackup.io/docs/setup/m365-access/"
 echo "You will also need to have gathered your credentials for AWS or compatible S3 storage and have the url."
-read -p "Are you ready to proceed?" final_continue
-if [ "$final_continue" != "n ]; then
+read -p "Are you ready to proceed? (y/n):" final_continue
+if [ "$final_continue" != "y" ]; then
      exit 0
 fi
 
@@ -42,12 +42,21 @@ if ! command -v git &> /dev/null; then
     exit 1
 fi
 
+rm -r /opt/corso
+mkdir /opt/corso
+
 # Clone the repository to /opt/corso
-git clone https://github.com/meuchels/corso-multitenant /opt/corso
+git clone -q https://github.com/meuchels/corso-multitenant /opt/corso
 
 echo "Repository cloned successfully to /opt/corso."
 
 cd /opt/corso
+
+# Downloading the latest version of Corso
+
+curl -s https://api.github.com/repos/alcionai/corso/releases/latest | grep 'browser_download_url.*corso_.*_Linux_x86_64.tar.gz' | cut -d : -f 2,3 | tr -d \" | wget -i -
+tar -xzvf corso_v0.14.0_Linux_x86_64.tar.gz
+rm corso*.tar.gz
 mkdir /opt/corso/log
 mkdir /opt/corso/toml
 mkdir /opt/corso/scripts/back-active
